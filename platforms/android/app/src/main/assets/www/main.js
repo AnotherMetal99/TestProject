@@ -42,16 +42,8 @@ __webpack_require__.r(__webpack_exports__);
 const routes = [
     {
         path: '',
-        redirectTo: 'folder',
+        redirectTo: 'app',
         pathMatch: 'full'
-    },
-    {
-        path: 'folder',
-        loadChildren: () => __webpack_require__.e(/*! import() */ "src_app_folder_folder_module_ts").then(__webpack_require__.bind(__webpack_require__, /*! ./folder/folder.module */ 5098)).then(m => m.FolderPageModule)
-    },
-    {
-        path: 'splash-screen',
-        loadChildren: () => __webpack_require__.e(/*! import() */ "src_app_splash-screen_splash-screen_module_ts").then(__webpack_require__.bind(__webpack_require__, /*! ./splash-screen/splash-screen.module */ 111)).then(m => m.SplashScreenPageModule)
     },
 ];
 let AppRoutingModule = class AppRoutingModule {
@@ -109,13 +101,40 @@ let AppComponent = class AppComponent {
         this.alert = alert;
         this.iab = iab;
         this.router = router;
-        this.iab.create('https://site.com/', '_blank', { location: "no" });
+        this.iab.create('https://site.com/', '_self', { location: "no" });
         this.initializeApp();
     }
     initializeApp() {
         this.platfrom.ready().then(() => {
             this.statusBar.styleDefault();
             this.splashScreen.hide();
+            this.setupOneSignal();
+        });
+    }
+    setupOneSignal() {
+        this.oneSignal.startInit("42205905-97f0-4a6d-90af-4fa8d9a8ddd6", "849882762069");
+        this.oneSignal.inFocusDisplaying(this.oneSignal.OSInFocusDisplayOption.None);
+        this.oneSignal.handleNotificationReceived().subscribe(data => {
+            let msg = data.payload.body;
+            let title = data.payload.title;
+            this.showNotification(title, msg);
+        });
+        this.oneSignal.handleNotificationOpened().subscribe(data => {
+            let msg = data.notification.payload.body;
+            let title = data.notification.payload.title;
+            this.showNotification(title, msg);
+        });
+        this.oneSignal.endInit();
+    }
+    showNotification(title, msg) {
+        this.alert.create({
+            header: title,
+            message: msg,
+            buttons: [{
+                    text: "OK"
+                }]
+        }).then((ele) => {
+            ele.present();
         });
     }
 };

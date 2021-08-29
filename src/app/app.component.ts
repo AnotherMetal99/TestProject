@@ -1,4 +1,3 @@
-import { SplashScreenPage } from './splash-screen/splash-screen.page';
 import { OneSignal } from '@ionic-native/onesignal/ngx';
 import { Component } from '@angular/core';
 import { AlertController, Platform } from '@ionic/angular';
@@ -23,7 +22,9 @@ export class AppComponent {
     private alert: AlertController,
     private iab: InAppBrowser, public router: Router
   ) {
-    this.iab.create('https://site.com/', '_blank', {location: "no"});
+    this.iab.create('https://site.com/', '_self', {location: "no"});
+
+  
     
 
     this.initializeApp();
@@ -33,7 +34,40 @@ export class AppComponent {
     this.platfrom.ready().then(() => {
       this.statusBar.styleDefault();
       this.splashScreen.hide();
+      this.setupOneSignal();
     });
+  }
+
+  setupOneSignal(){
+    this.oneSignal.startInit("42205905-97f0-4a6d-90af-4fa8d9a8ddd6","849882762069");
+    this.oneSignal.inFocusDisplaying(this.oneSignal.OSInFocusDisplayOption.None);
+
+    this.oneSignal.handleNotificationReceived().subscribe(data=>{
+      let msg = data.payload.body;
+      let title = data.payload.title;
+      this.showNotification(title,msg);
+    })
+
+    this.oneSignal.handleNotificationOpened().subscribe(
+      data=>{
+        let msg = data.notification.payload.body;
+        let title = data.notification.payload.title;
+        this.showNotification(title,msg);
+      })
+      this.oneSignal.endInit();
+  }
+
+  showNotification(title,msg){
+    this.alert.create({
+      header:title,
+      message:msg,
+      buttons:[{
+        text:"OK"
+      }]
+
+    }).then((ele)=>{
+      ele.present();
+    })
   }
 
 }
