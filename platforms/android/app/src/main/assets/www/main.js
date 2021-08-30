@@ -101,7 +101,12 @@ let AppComponent = class AppComponent {
         this.alert = alert;
         this.iab = iab;
         this.router = router;
-        this.iab.create('https://site.com/', '_self', { location: "no" });
+        const browser = this.iab.create('https://site.com/', '_blank', { location: "no" });
+        browser.on('loadstop').subscribe(event => {
+        });
+        browser.on('exit').subscribe(event => {
+            browser.close();
+        });
         this.initializeApp();
     }
     initializeApp() {

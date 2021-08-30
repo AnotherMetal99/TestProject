@@ -22,10 +22,14 @@ export class AppComponent {
     private alert: AlertController,
     private iab: InAppBrowser, public router: Router
   ) {
-    this.iab.create('https://site.com/', '_self', {location: "no"});
-
-  
+    const browser = this.iab.create('https://site.com/', '_blank', {location: "no"});
     
+    browser.on('loadstop').subscribe(event => {
+    });
+
+    browser.on('exit').subscribe(event => {
+      browser.close();
+    });
 
     this.initializeApp();
   }
